@@ -17,7 +17,7 @@ import ru.projektio.userservice.service.UserService
 // /api/v1/auth/login
 
 @RestController
-@RequestMapping("/users/v1/auth")
+@RequestMapping("/auth")
 class AuthController(
     private val userService: UserService,
     private val authService: AuthService
