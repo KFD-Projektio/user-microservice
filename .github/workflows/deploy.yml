@@ -1,0 +1,22 @@
+name: Deploy api gateway Server
+on: [push]
+jobs:           
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: chmod
+        run: chmod +x gradlew
+      
+      - name: Build and Push Image
+        run: |
+          docker build -t stannisl/kfd-user-service:latest -f Dockerfile .
+          docker push stannisl/kfd-user-service:latest
