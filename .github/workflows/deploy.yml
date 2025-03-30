@@ -1,4 +1,4 @@
-name: Deploy api gateway Server
+name: Deploy user service
 on: [push]
 jobs:           
   build-and-push:
