@@ -14,5 +14,3 @@ spring:
         max-attempts: 10
   config:
     import: "configserver:"
-
-debug: true
