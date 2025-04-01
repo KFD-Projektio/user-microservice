@@ -1,7 +1,7 @@
 package ru.projektio.userservice.database.entity
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Table(name = "refresh_token")
@@ -10,7 +10,7 @@ class RefreshTokenEntity(
     val token: String,
 
     @Column(name = "expires_at")
-    val expiresAt: LocalDateTime,
+    val expiresAt: Date,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

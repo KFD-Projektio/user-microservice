@@ -26,12 +26,15 @@ class AuthController(
     fun login(@RequestBody request: LoginRequest): ResponseEntity<AuthResponse> { TODO("Finish") }
 
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthResponse> { TODO("Finish") }
+    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthResponse> {
+//        val UserResponse = authService.register(request)
+        TODO("Potom")
+    }
 
     @PostMapping("/refresh")
     fun refresh(@RequestBody request: RefreshRequest): ResponseEntity<AuthResponse> { TODO("Finish") }
 
     @GetMapping("/check")
-    fun check(): ResponseEntity<TestResponse> { return ResponseEntity.ok( TestResponse("Hello world!"))
+    fun check(): ResponseEntity<TestResponse> { return ResponseEntity.ok(TestResponse("Hello world!"))
     }
 }
