@@ -1,7 +1,10 @@
 package ru.projektio.userservice.service.impl
 
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.springframework.stereotype.Service
 import ru.projektio.userservice.config.properties.JwtProperties
 import ru.projektio.userservice.database.entity.RefreshTokenEntity
 import ru.projektio.userservice.database.entity.UserEntity
@@ -9,6 +12,7 @@ import ru.projektio.userservice.database.repository.RefreshTokenDao
 import ru.projektio.userservice.service.JwtTokenService
 import java.util.*
 
+@Service
 class JwtTokenServiceImpl(
     private val jwtProperties: JwtProperties,
     private val refreshTokenDao: RefreshTokenDao
@@ -30,16 +34,12 @@ class JwtTokenServiceImpl(
         refreshTokenDao.save(
             RefreshTokenEntity(
                 token = refreshToken,
-                expiresAt = refreshTokenExpiration,
-                user = user
+                user = user,
+                expiresAt = getTokenExpiration(refreshToken)
             )
         )
 
         return accessToken to refreshToken
-    }
-
-    override fun getRefreshTokenExpiration(token: String): String {
-        TODO("Not yet implemented")
     }
 
     private fun createToken(user: UserEntity, expiration: Date, claims: Map<String, Any> = mapOf()): String =
@@ -56,4 +56,13 @@ class JwtTokenServiceImpl(
 
     private fun getRefreshTokenExpirationDate() =
         Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiration)
+
+    override fun getTokenExpiration(token: String): Date =
+        getAllClaimsFromToken(token).expiration
+
+    override fun isTokenNotExpired(token: String): Boolean =
+        getAllClaimsFromToken(token).expiration.after(Date())
+
+    private fun getAllClaimsFromToken(token: String): Claims =
+        Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).payload
 }

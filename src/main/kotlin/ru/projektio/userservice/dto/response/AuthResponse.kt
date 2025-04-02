@@ -9,8 +9,6 @@ data class AuthResponse(
     val refreshToken: String,
     @field:JsonProperty("token_type")
     val tokenType: String = "Bearer",
-    @field:JsonProperty("expires_in")
-    val expiresIn: Long,
     @field:JsonProperty("user_id")
     val userId: Long,
     val email: String,

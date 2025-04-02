@@ -7,7 +7,7 @@ import ru.projektio.userservice.dto.request.RegisterRequest
 import ru.projektio.userservice.dto.response.AuthResponse
 
 interface AuthService {
-    fun authenticate(request: LoginRequest): ResponseEntity<AuthResponse>
-    fun register(request: RegisterRequest): ResponseEntity<AuthResponse>
-    fun refresh(request: RefreshRequest): ResponseEntity<AuthResponse>
+    fun authenticate(request: LoginRequest): AuthResponse
+    fun register(request: RegisterRequest): AuthResponse
+    fun refresh(request: RefreshRequest): AuthResponse
 }
