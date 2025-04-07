@@ -6,6 +6,7 @@ import ru.projektio.userservice.dto.response.AuthResponse
 import java.util.*
 
 interface JwtTokenService {
+    fun getUsernameFromToken(token: String): String
     fun validateToken(token: String): Boolean
     fun createTokenPair(user: UserEntity): Pair<String, String>
     fun isTokenNotExpired(token: String): Boolean

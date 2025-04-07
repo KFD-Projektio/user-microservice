@@ -23,5 +23,10 @@ class UserController(
 
     @PostMapping
     fun createUser(@RequestBody request: RegisterRequest): ResponseEntity<UserResponse> =
-        ResponseEntity.ok(userService.create(request))
+        ResponseEntity.ok(UserResponse.fromEntity(userService.create(request)))
+
+    @GetMapping("/me")
+    fun getCurrentUser(): ResponseEntity<UserResponse> =
+        ResponseEntity.ok(UserResponse.fromEntity(userService.getAuthorizedUser()))
+
 }

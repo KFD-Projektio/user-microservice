@@ -1,11 +1,14 @@
 package ru.projektio.userservice.service.impl
 
+import jakarta.ws.rs.BadRequestException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.projektio.userservice.database.entity.UserEntity
 import ru.projektio.userservice.database.repository.UserDao
 import ru.projektio.userservice.dto.request.RegisterRequest
+import ru.projektio.userservice.exception.exceptions.BadAuthRequestException
 import ru.projektio.userservice.exception.exceptions.user.DuplicateEmailException
 import ru.projektio.userservice.exception.exceptions.user.DuplicateLoginException
 import ru.projektio.userservice.service.UserService
@@ -51,4 +54,7 @@ class UserServiceImpl(
         )
         return userDao.save(user)
     }
+
+    override fun getAuthorizedUser(): UserEntity =
+        userDao.findByLogin(SecurityContextHolder.getContext().authentication.name) ?: throw BadAuthRequestException("User not found")
 }

@@ -1,8 +1,6 @@
 package ru.projektio.userservice.service.impl
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwt
-import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
 import ru.projektio.userservice.config.properties.JwtProperties
@@ -21,7 +19,20 @@ class JwtTokenServiceImpl(
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
     override fun validateToken(token: String): Boolean {
-        TODO("Not yet implemented")
+        return try {
+            getAllClaimsFromToken(token)
+            isTokenNotExpired(token)
+        } catch (ex: MalformedJwtException) {
+            false
+        } catch (ex: ExpiredJwtException) {
+            false
+        } catch (ex: IllegalArgumentException) {
+            false
+        }
+    }
+
+    override fun getUsernameFromToken(token: String): String {
+        return getAllClaimsFromToken(token).subject
     }
 
     override fun createTokenPair(user: UserEntity): Pair<String, String> {
@@ -30,7 +41,6 @@ class JwtTokenServiceImpl(
         val refreshTokenExpiration = getRefreshTokenExpirationDate()
         val refreshToken = createToken(user, refreshTokenExpiration)
 
-
         refreshTokenDao.save(
             RefreshTokenEntity(
                 token = refreshToken,
@@ -38,7 +48,6 @@ class JwtTokenServiceImpl(
                 expiresAt = getTokenExpiration(refreshToken)
             )
         )
-
         return accessToken to refreshToken
     }
 

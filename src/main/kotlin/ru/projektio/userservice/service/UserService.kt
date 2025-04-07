@@ -5,4 +5,5 @@ import ru.projektio.userservice.dto.request.RegisterRequest
 
 interface UserService {
     fun create(request: RegisterRequest): UserEntity
+    fun getAuthorizedUser(): UserEntity
 }
