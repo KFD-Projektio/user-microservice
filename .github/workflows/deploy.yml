@@ -1,6 +1,11 @@
 name: Deploy user service
-on: [push]
-jobs:           
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -15,7 +20,7 @@ jobs:
 
       - name: chmod
         run: chmod +x gradlew
-      
+
       - name: Build and Push Image
         run: |
           docker build -t stannisl/kfd-user-service:latest -f Dockerfile .
