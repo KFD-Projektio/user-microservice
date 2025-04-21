@@ -42,7 +42,7 @@ class SecurityConfig(
     fun apiFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/**")
-            .cors { corsConfigurationSource() }
+            .cors { it.disable() }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
