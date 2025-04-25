@@ -11,12 +11,6 @@ class UserEntity(
     @Column(name = "email")
     var email: String,
 
-    @Column(name = "password")
+    @Column(name = "password", length = 265)
     val passwordHash: String,
-) : AbstractEntity() {
-
-    @ElementCollection
-    @CollectionTable(name = "user_boards", joinColumns = [JoinColumn(name = "user_id")])
-    @Column(name = "board_id")
-    val boardIDs: MutableList<Long> = mutableListOf()
-}
+) : AbstractEntity()

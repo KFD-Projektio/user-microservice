@@ -1,7 +1,6 @@
 package ru.projektio.userservice.service.impl
 
 import io.jsonwebtoken.*
-import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
 import ru.projektio.userservice.config.properties.JwtProperties
 import ru.projektio.userservice.database.entity.RefreshTokenEntity
@@ -9,24 +8,40 @@ import ru.projektio.userservice.database.entity.UserEntity
 import ru.projektio.userservice.database.repository.RefreshTokenDao
 import ru.projektio.userservice.service.JwtTokenService
 import java.util.*
+import io.jsonwebtoken.io.Decoders
+import org.postgresql.ssl.PKCS12KeyManager
+import java.security.KeyFactory
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
 
 @Service
 class JwtTokenServiceImpl(
     private val jwtProperties: JwtProperties,
     private val refreshTokenDao: RefreshTokenDao
 ) : JwtTokenService {
+    private val privateKey: PrivateKey by lazy {
+        val keyBytes = Decoders.BASE64.decode(jwtProperties.privateRsaFile.replace("\n", ""))
 
-    private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
+        val keySpec = PKCS8EncodedKeySpec(keyBytes)
+        KeyFactory.getInstance("RSA").generatePrivate(keySpec)
+    }
+
+    private val publicKey: PublicKey by lazy {
+
+        val keyBytes = Decoders.BASE64.decode(jwtProperties.publicRsaFile.replace("\n", ""))
+
+        val keySpec = X509EncodedKeySpec(keyBytes)
+        KeyFactory.getInstance("RSA").generatePublic(keySpec)
+    }
+
 
     override fun validateToken(token: String): Boolean {
         return try {
             getAllClaimsFromToken(token)
             isTokenNotExpired(token)
-        } catch (ex: MalformedJwtException) {
-            false
-        } catch (ex: ExpiredJwtException) {
-            false
-        } catch (ex: IllegalArgumentException) {
+        } catch (ex: JwtException) {
             false
         }
     }
@@ -57,7 +72,7 @@ class JwtTokenServiceImpl(
             .subject(user.login)
             .issuedAt(Date(System.currentTimeMillis()))
             .expiration(expiration)
-            .signWith(secretKey)
+            .signWith(privateKey, Jwts.SIG.RS256)
             .compact()
 
     private fun getAccessTokenExpirationDate() =
@@ -73,5 +88,5 @@ class JwtTokenServiceImpl(
         getAllClaimsFromToken(token).expiration.after(Date())
 
     private fun getAllClaimsFromToken(token: String): Claims =
-        Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).payload
+        Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(token).payload
 }
