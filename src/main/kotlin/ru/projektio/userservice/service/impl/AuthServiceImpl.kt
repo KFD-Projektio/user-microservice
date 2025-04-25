@@ -16,6 +16,7 @@ import ru.projektio.userservice.exception.exceptions.CredentialsMismatchExceptio
 import ru.projektio.userservice.service.AuthService
 import ru.projektio.userservice.service.JwtTokenService
 import ru.projektio.userservice.service.UserService
+import java.util.*
 
 @Service
 class AuthServiceImpl(
@@ -25,9 +26,15 @@ class AuthServiceImpl(
     private val jwtTokenService: JwtTokenService,
     private val passwordEncoder: PasswordEncoder
 ) : AuthService {
+
+    @Transactional
+    override fun logout(refreshToken: String) {
+        refreshTokenDao.findByToken(refreshToken)?.let { refreshTokenDao.delete(it) }
+    }
+
     @Transactional
     override fun authenticate(request: LoginRequest): AuthResponse {
-        val user = getUser(request) ?: throw BadAuthRequestException("No user exists.")
+        val user = getUserFromLoginRequest(request) ?: throw BadAuthRequestException("No user exists.")
 
         if (!passwordEncoder.matches(request.password, user.passwordHash))
             throw CredentialsMismatchException("Password mismatch")
@@ -42,20 +49,18 @@ class AuthServiceImpl(
 
     @Transactional
     override fun refresh(request: RefreshRequest): AuthResponse {
-        val refreshToken: RefreshTokenEntity = refreshTokenDao.findByToken(request.refreshToken)
+        val refreshToken = refreshTokenDao.findByToken(request.refreshToken)
             ?: throw BadAuthRequestException("No provided refresh token exists.")
 
-        if (jwtTokenService.getTokenExpiration(refreshToken.token).time > System.currentTimeMillis()) {
+        if (refreshToken.expiresAt.before(Date())) { // Проверка на истечение срока
             refreshTokenDao.delete(refreshToken)
             throw BadAuthRequestException("Token expired.")
         }
 
-        val user: UserEntity = refreshToken.user
-
-        return authUser(user)
+        return authUser(refreshToken.user)
     }
 
-    private fun getUser(request: LoginRequest): UserEntity? = when {
+    private fun getUserFromLoginRequest(request: LoginRequest): UserEntity? = when {
             request.login != null -> userDao.findByLogin(request.login)
             request.email != null -> userDao.findByEmail(request.email)
             else -> throw BadAuthRequestException(("No login and email were provided in request."))

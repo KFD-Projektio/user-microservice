@@ -9,8 +9,7 @@ class UserMapper : AbstractMapper<UserEntity, UserResponse> {
             id = entity.id,
             login = entity.login,
             email = entity.email,
-            createdAt = entity.createdAt,
-            boardIds = entity.boardIDs
+            createdAt = entity.createdAt
         )
     }
 }

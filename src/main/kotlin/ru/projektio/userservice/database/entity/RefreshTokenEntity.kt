@@ -6,7 +6,7 @@ import java.util.*
 @Entity
 @Table(name = "refresh_token")
 class RefreshTokenEntity(
-    @Column(name = "token")
+    @Column(name = "token", length = 512)
     val token: String,
 
     @Column(name = "expires_at")

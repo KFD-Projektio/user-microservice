@@ -10,4 +10,5 @@ interface AuthService {
     fun authenticate(request: LoginRequest): AuthResponse
     fun register(request: RegisterRequest): AuthResponse
     fun refresh(request: RefreshRequest): AuthResponse
+    fun logout(refreshToken: String)
 }

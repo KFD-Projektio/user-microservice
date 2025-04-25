@@ -8,11 +8,9 @@ import ru.projektio.userservice.dto.request.RegisterRequest
 import ru.projektio.userservice.dto.response.AuthResponse
 import ru.projektio.userservice.dto.response.TestResponse
 import ru.projektio.userservice.service.AuthService
-// /api/v1/auth/login
 
 @RestController
 @RequestMapping("/auth")
-//@CrossOrigin(origins = ["*"], allowCredentials = "true")
 class AuthController(
     private val authService: AuthService
 ) {
@@ -28,7 +26,9 @@ class AuthController(
     fun refresh(@RequestBody request: RefreshRequest): ResponseEntity<AuthResponse> =
         ResponseEntity.ok(authService.refresh(request))
 
-    @GetMapping("/check")
-    fun check(): ResponseEntity<TestResponse> { return ResponseEntity.ok(TestResponse("Hello world!"))
+    @PostMapping("/logout")
+    fun logout(@RequestBody request: RefreshRequest): ResponseEntity<Map<String, String>> {
+        authService.logout(request.refreshToken)
+        return ResponseEntity.ok(mapOf("status" to "ok"))
     }
 }

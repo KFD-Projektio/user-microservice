@@ -47,6 +47,10 @@ class UserServiceImpl(
         validateRequest(request)
         checkUniqueness(request.login, request.email)
 
+        val passHash = passwordEncoder.encode(request.password)
+
+        println(passHash.length)
+
         val user = UserEntity(
             login = request.login,
             email = request.email,
