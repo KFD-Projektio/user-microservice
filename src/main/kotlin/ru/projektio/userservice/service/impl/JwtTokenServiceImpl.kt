@@ -51,10 +51,12 @@ class JwtTokenServiceImpl(
     }
 
     override fun createTokenPair(user: UserEntity): Pair<String, String> {
-        val accessToken = createToken(user, getAccessTokenExpirationDate())
+        val claims = mapOf("user_id" to user.id)
+
+        val accessToken = createToken(user, getAccessTokenExpirationDate(), claims)
 
         val refreshTokenExpiration = getRefreshTokenExpirationDate()
-        val refreshToken = createToken(user, refreshTokenExpiration)
+        val refreshToken = createToken(user, refreshTokenExpiration, claims)
 
         refreshTokenDao.save(
             RefreshTokenEntity(
