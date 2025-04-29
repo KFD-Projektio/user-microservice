@@ -51,7 +51,7 @@ class JwtTokenServiceImpl(
     }
 
     override fun createTokenPair(user: UserEntity): Pair<String, String> {
-        val claims = mapOf("user_id" to user.id)
+        val claims = mapOf("user_id" to user.id.toString())
 
         val accessToken = createToken(user, getAccessTokenExpirationDate(), claims)
 
