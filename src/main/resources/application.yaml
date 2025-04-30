@@ -16,3 +16,6 @@ spring:
     import: "configserver:"
 
 
+logging:
+  level:
+    ru.projektio.userservice: trace

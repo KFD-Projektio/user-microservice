@@ -28,6 +28,21 @@ class SecurityConfig(
 
     @Order(1)
     @Bean
+    fun actuatorFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .securityMatcher("/actuator/**")
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests {
+                it.anyRequest().permitAll()
+            }
+            .cors { it.disable() }
+            .csrf{ it.disable() }
+
+        return http.build()
+    }
+
+    @Order(2)
+    @Bean
     fun internalFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/internal/api/**")
@@ -37,7 +52,7 @@ class SecurityConfig(
         return http.build()
     }
 
-    @Order(2)
+    @Order(3)
     @Bean
     fun apiFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
