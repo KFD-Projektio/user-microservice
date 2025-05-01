@@ -68,7 +68,7 @@ class AuthServiceImpl(
 
     private fun authUser(user: UserEntity): AuthResponse {
         refreshTokenDao.deleteByUserId(user.id)
-        
+
         val (accessToken, refreshToken) = jwtTokenService.createTokenPair(user)
 
         refreshTokenDao.save(

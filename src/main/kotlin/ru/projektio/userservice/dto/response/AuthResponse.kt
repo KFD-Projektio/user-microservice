@@ -3,7 +3,7 @@ package ru.projektio.userservice.dto.response
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class AuthResponse(
-//    @field:JsonProperty("access_token")
+//    @field:JsonProperty("access_token")?
     val accessToken: String,
 //    @field:JsonProperty("refresh_token")
     val refreshToken: String,

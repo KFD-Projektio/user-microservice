@@ -58,13 +58,6 @@ class JwtTokenServiceImpl(
         val refreshTokenExpiration = getRefreshTokenExpirationDate()
         val refreshToken = createToken(user, refreshTokenExpiration, claims)
 
-        refreshTokenDao.save(
-            RefreshTokenEntity(
-                token = refreshToken,
-                user = user,
-                expiresAt = getTokenExpiration(refreshToken)
-            )
-        )
         return accessToken to refreshToken
     }
 

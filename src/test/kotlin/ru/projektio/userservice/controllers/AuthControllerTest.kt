@@ -1,44 +1,37 @@
 package ru.projektio.userservice.controllers
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.postForEntity
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpStatus
-import ru.projektio.userservice.database.repository.UserDao
+import org.springframework.http.*
 import ru.projektio.userservice.dto.request.LoginRequest
 import ru.projektio.userservice.dto.request.RegisterRequest
 import ru.projektio.userservice.dto.response.AuthResponse
-import ru.projektio.userservice.service.AuthService
-
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthControllerTest {
 
-  @Autowired
-  lateinit var userDao: UserDao
+ @Autowired lateinit var restTemplate: TestRestTemplate
 
-  @LocalServerPort
-  private var localServerPort: Int = 0
+ @Test
+ fun `register user returns 201`() {
+  val request = RegisterRequest("user2", "user2@test.com", "Pass123!")
+  val response = restTemplate.postForEntity("/auth/register", request, AuthResponse::class.java)
 
-  @Autowired
-  lateinit var testRestTemplate: TestRestTemplate
+  assertEquals(HttpStatus.CREATED, response.statusCode)
+  assertNotNull(response.body?.accessToken)
+ }
 
-  private lateinit var host: String
+ @Test
+ fun `login with invalid credentials returns 400`() {
+  val request = LoginRequest("unknown", null, "wrong")
+  val response = restTemplate.postForEntity("/auth/login", request, String::class.java)
 
-@BeforeAll
- fun setup() {
-  host = "http://localhost:$localServerPort"
-  userDao.deleteAll()
+  assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
  }
 
  @Test
@@ -46,11 +39,11 @@ class AuthControllerTest {
   val request = RegisterRequest(
    "misha_zxc",
    "Test@test.ru",
-   "mega_parol"
+   "Mega_parol!22"
   )
 
-  val response = testRestTemplate.postForEntity(
-   "$host/auth/register",
+  val response = restTemplate.postForEntity(
+   "/auth/register",
    request,
    AuthResponse::class.java
   )
@@ -64,11 +57,11 @@ class AuthControllerTest {
   val request = LoginRequest(
    login = "misha_zxc",
    email = null,
-   password = "mega_parol"
+   password = "Mega_parol!22"
   )
 
-  val response = testRestTemplate.postForEntity(
-   "auth/login",
+  val response = restTemplate.postForEntity(
+   "/auth/login",
    request,
    AuthResponse::class.java
   )
@@ -77,9 +70,4 @@ class AuthControllerTest {
   assertThat(response.body?.accessToken).isNotBlank()
   assertThat(response.body?.refreshToken).isNotBlank()
  }
-
-
-
-
-
 }
